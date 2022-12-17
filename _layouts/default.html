@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="{{ page.lang | default: site.lang | default: "en" }}">
 
-    {%- include head.html -%}
-    
+  {%- include head.html -%}
+
   <body>
 
     {%- include header.html -%}
@@ -18,20 +18,13 @@
   </body>
 
   <!-- for mathjax support -->
-  {% if page.usemathjax %}
-  <script>
-    MathJax = {
-      tex: {
-        inlineMath: [['$', '$']]
-      }
-    };
-  </script>
-  <script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-    TeX: { equationNumbers: { autoNumber: "AMS" } }
-    });
-  </script>
-  <script type="text/javascript" async src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-{% endif %}
+    {% if page.usemathjax %}
+      <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+        });
+      </script>
+      <script type="text/javascript" async src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    {% endif %}
 
 </html>
