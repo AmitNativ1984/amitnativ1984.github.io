@@ -71,7 +71,7 @@ The network is trained by feeding the spectogram to the NN and predicting the gr
 The original AlexNet:
 ![AlexNet-Regression]
 
-- **The Loss function**: $$ L_1 = |BP - BP'| $$
+- **The Loss function**: \\[L_1 = |BP - BP'|\\]
  Which is good for regression tasks (both predicting both positive and negative values)
 
 
