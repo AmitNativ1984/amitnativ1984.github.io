@@ -34,7 +34,7 @@ theme: minima
 plugins:
   - jekyll-feed
 
-
+markdown: kramdown
 # include:
 include:
   - assets/images/2022-12-16-blood-pressure-with-cnn/**
