@@ -1,0 +1,82 @@
+---
+layout: post
+title:  "AN OVERVIEW OF VARIATIONAL AUTOENCODERS"
+date:   2022-12-18 16:00:00 +0200
+categories: intresting
+usemathjax: true
+---
+
+# Dimentionality reduction
+Dimentionality reduction is the process of finding a new represention of the data, with fewer dimensions, while preserving as much of the information as possible. This is useful in many applications, such as compression, increasing robustness to noise, and visualization. 
+The framework of dimentionlity reduction is composed of two parts: An **encoder** and a **decoder**. The encoder maps the input data to a lower dimentional space, also called the **latent space** and the decoder maps the latent space back to original space. Becuase the dimentions of the latent space are smaller than the original space, the process might be lossy. The purpose of the encoder and decoder is to find the best possible compressed representation of the data, while minimizing the loss of information during reconstruction.
+The general autoencoder is represented in the following figure:
+
+![Dimentionality reduction]
+
+
+Lets look at the following example: Say we have a dataset of faces. We want to reduce the dimentionality of the dataset to a vector a 6 dimentions. An ideal autoencoder will find some descriptive features of the faces. The encoder will map the face to a 6 dimentional latent space vector, and the decoder will map this vector back to the exact face. **It is important to note that in this configuration the latent space is discrete**. The following figure shows the process:
+![faces-autoencoder]
+
+# Autoencoders
+The general idea of autoencoders is to set the encoder and decoder as neural networks. The training aims to find the best encoder and decoder that will minimize the loss of information. The network is trained by encoding and reconstructing the input data, and then backpropagate the error to update the network weights and biases. The following figure shows the process:
+![nn-autoencoder]
+
+## Relation to PCA:
+If we set the encoder to be a single layer neural network, with only linear activation functions, the autoencoder will be equivalent to PCA. This is becuase the autoencoder learns a linear transform that projects the input data to a latent space with fewer dimensions, and then reconstructs it.
+However, in constrast to PCA, the vectors spanning the latent space are not necessarly indepent or orthogonal. This is a result of the learning process of the autoencoder.
+![pca]
+
+## Making autoencoders deep and non-linear
+Now lets assume the above autoencoder is deep with non-linear activation functions. In such case the model will be able to learn more complex representations of the data. This can be described in the following figure:
+![linear-vs-nonlinear-autoencoder]
+
+As a though experiment, if the encoder and decoder have enough degrees of freedom, the latent space dimention can be reduce to 1. Such an encoder with inifinte power can encode inital datapoints and encode them as $$1,2,3,..,N$$ integer datapoints. The decoder could then make the reverse process and decode the integer datapoints to the original data.
+
+# Limitations of Autoencoders for content generation
+The fundemental problem with autoencoders, is that the latent space representation of the input space is not garentied to be continuous, or allow easy interpulation between points. This is called the **lack of regularity** in the latent space.
+What this means is that after training, the clusters in the latent space may be far apart. To generate new content, we need to sample from the latent space. Because the latent space is not continuous, the genreated data is likely to be meaningless. **It is therfore important to regularized the latent space so it is regular "enough"**
+Here is an illustration of the problem:
+![latent-space]
+
+# **Definition of Variational Autoencoders**
+>**A variation autoencoder is an autoencoder whose training is regularized to avoid overfitting and ensure the latent space is continous. This is done by encoding the input as a distribution over the latent space, allowing sampling and interpolation**
+
+## Implementation
+
+The model is trained as follows:
+1. Encode the input as distribution over the latent space. Estimate the mean $$\mu$$ and variance $$\sigma$$ of the distribution. Assume normal distribution.
+2. Sample a point from the encoded distribution.
+3. Decode the sample point through the decoder.
+4. Backpropagate the reconsruction error.
+
+![VAE]
+
+![regulariztion-on-latent-space]
+
+
+## Implementation
+## Backpropagation
+## Reparemeterization trick
+## Log Variance trick
+## Loss function
+## Visualzing the latent space
+## VAE as a generative model: Sampling from the latent space
+
+## VAE - the probabilistic view
+
+
+[Dimentionality reduction]: /assets/images/2022-12-18-VAE/dimentionality-reduction.png
+
+[faces-autoencoder]: /assets/images/2022-12-18-VAE/faces-autoencoder.png 
+
+[pca]: /assets/images/2022-12-18-VAE/pca.png
+
+[nn-autoencoder]: /assets/images/2022-12-18-VAE/nn-autoencoders.png
+
+[linear-vs-nonlinear-autoencoder]: /assets/images/2022-12-18-VAE/linear-vs-nonlinear-autoencoder.png
+
+[latent-space]: /assets/images/2022-12-18-VAE/latent-space.png
+
+[VAE]: /assets/images/2022-12-18-VAE/VAE.png
+
+[regulariztion-on-latent-space]: /assets/images/2022-12-18-VAE/regulariztion-on-latent-space.png
