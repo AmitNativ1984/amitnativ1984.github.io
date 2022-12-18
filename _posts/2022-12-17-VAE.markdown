@@ -42,25 +42,33 @@ Here is an illustration of the problem:
 >**A variation autoencoder is an autoencoder whose training is regularized to avoid overfitting and ensure the latent space is continous. This is done by encoding the input as a distribution over the latent space, allowing sampling and interpolation**
 
 ## Implementation
+1. The encoder will output two vectors, describing the mean ($$\vec{\mu}={\mu_1,\mu_2,...,\mu_n}$$) and variance ($$\vec{\sigma}={\sigma_1,\sigma_2,...,\sigma_n}$$) of a guassian distribution over the latent space.
+2. Sample a point from the distribution. In order to allow backpropagation, we use the **reparameterization trick**. This is done by sampling $$\vec{\epsilon}$$ from a standard normal distribution, and then scaling and shifting it by the mean and variance of the distribution. 
 
-The model is trained as follows:
-1. Encode the input as distribution over the latent space. Estimate the mean $$\mu$$ and variance $$\sigma$$ of the distribution. Assume normal distribution.
-2. Sample a point from the encoded distribution.
-3. Decode the sample point through the decoder.
-4. Backpropagate the reconsruction error.
+    \\[\vec{z}=\vec{\mu}+\vec{\sigma}\odot\vec{\epsilon}\\]
+
+    \\[\vec{\epsilon}\sim N(0,1)\\]
+
+3. Decode the sampled point through the decoder.
+
+:**Note**: In order to allow negative values for $$\vec{\sigma}$$ and imporve stability, typically have the network learn $$log({\sigma})$$. This is known as the **log variance trick**. It also maps the variance to a larger range between $$[0,1]$$
+
+4. The VAE loss function is: 
+   
+   $$
+    L = \mathcal{L}(\vec{x},\hat{x}) + \beta KL(N(\vec{\mu},\vec{\sigma})||N(0,1))
+   $$
+   
+    Where $$\mathcal{L}(\vec{x},\hat{x})$$ is the reconstruction loss, $$\beta$$ is a hyperparameter, and $$KL$$ is the Kullback-Leibler divergence between the distribution of the latent space and a standard normal distribution. The KL divergence is used to regularize the latent space, and ensure it is continous. The KL divergence is minimized when the distribution of the latent space is close to a standard normal distribution. 
+
+5. Backpropagate the error.
+
 
 ![VAE]
 
+The effects of the loss function can be seen in the following figure:
 ![regulariztion-on-latent-space]
 
-
-## Implementation
-## Backpropagation
-## Reparemeterization trick
-## Log Variance trick
-## Loss function
-## Visualzing the latent space
-## VAE as a generative model: Sampling from the latent space
 
 ## VAE - the probabilistic view
 
