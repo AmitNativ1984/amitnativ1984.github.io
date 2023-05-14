@@ -86,4 +86,4 @@ In order to make NAV2 work we need to provide it with the following inputs:
 
 Next, we send a **Pose Goal**. What happens then?
 
-<img src="../assets/images/Nav2/nav2_simplified.png" width="600">
+<img src="../assets/images/Nav2/nav2_simplified.png" width="800">
