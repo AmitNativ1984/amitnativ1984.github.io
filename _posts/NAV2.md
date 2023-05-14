@@ -13,11 +13,6 @@ ros2 launch turtlebot3_navigation2 navigation2.launch.py map:=<path_to_map.yaml>
 ### 1.1. Global Planner
 - Global planner is responsible to generate a path initial position to goal.
 - To Generate a path, the global planner needs two things:
-  - 1. A Map of the environment
-     ![environment map]
-
-
-
-
-
-[environment map]: /assets/images/Nav2/my_map.png
+  - 1. A Map of the environment:
+     
+     ![environment map](../assets/images/Nav2/my_map.png)
