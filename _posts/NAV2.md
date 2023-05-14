@@ -20,7 +20,7 @@ ros2 launch turtlebot3_navigation2 navigation2.launch.py map:=<path_to_map.yaml>
     - A cost map:
         A cost map assigns a cost to each pixel (cell) of the map. The cost is a value that represents how difficult is to navigate throught that cell.
 
-    ![cost map](../assets/images/Nav2/cost_map.png){:height="10%" width="10%"}
+    ![cost map](../assets/images/Nav2/cost_map.png){:height=10 width=10}
 
     By summing these two maps, we generate a global cost map. The global planner uses this global cost map to generate a path from the initial position to the goal.
 
