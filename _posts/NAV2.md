@@ -24,3 +24,5 @@ ros2 launch turtlebot3_navigation2 navigation2.launch.py map:=<path_to_map.yaml>
 
     By summing these two maps, we generate a global cost map. The global planner uses this global cost map to generate a path from the initial position to the goal.
 
+    ![global cost map](../assets/images/Nav2/global_cost_map.png)
+
