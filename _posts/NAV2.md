@@ -24,7 +24,7 @@ ros2 launch turtlebot3_navigation2 navigation2.launch.py map:=<path_to_map.yaml>
 
     | Occupancy Map | Cost Map | Global Cost Map |
     |:-------------:|:--------:|:---------------:|
-    | <img src="../assets/images/Nav2/my_map.png"> | <img src="../assets/images/Nav2/cost_map.png" width="400"> | <img src="../assets/images/Nav2/global_cost_map.png" width="400"> |
+    | <img src="../assets/images/Nav2/my_map.png" width="400"> | <img src="../assets/images/Nav2/cost_map.png" width="400"> | <img src="../assets/images/Nav2/global_cost_map.png" width="400"> |
     
     
 
