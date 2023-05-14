@@ -82,8 +82,8 @@ In order to make NAV2 work we need to provide it with the following inputs:
 > **TF**: The transformation between the map and the robot base.
 > 
 > **Sensor Data**: The sensor data from the robot, such as laser scans/ point clouds/ depth images/ odometry. 
->
 
 
 Next, we send a **Pose Goal**. What happens then?
+
 <img src="../assets/images/Nav2/nav2_simplified.png" width="600">
