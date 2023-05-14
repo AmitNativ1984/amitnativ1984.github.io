@@ -41,5 +41,49 @@ In the following image the local cost map is visible, along with the local path 
 | <img src="../assets/images/Nav2/local_cost_map.png" width="400"> | <img src="../assets/images/Nav2/local_path.png" width="400"> |
 
 
+## RECOVERY SERVER and RECOVERY BEHAVIORS
+Recovery behaviors are a set of predefined behaviors that the robot can execute when it is stuck, as can sometimes happen is real world scenarios. 
+- If the global planner is unable to generate a path, or the local planner is unable to follow path, then the recovery server is called.
+- For example: spin 90 degrees, move back 1 meter, then try again.
 
 
+## THE TF
+- The TFs are sets of frames and the transformations between them, which are updated and kept over time. ROS2 uses a few packages to handle the transformations:
+
+- `state_publisher` and `joint_state_publisher` packages: 
+  - Publishes the state of the frames (links and joints) of the robot according to URDF.
+
+- The TF2 package:
+  - Keeps track of each 3D coordinate frame **over time**
+  - Structured tree containing all the frames.
+  - To get TFs from the robot, use the package **robot_state_publisher**. It publishes the TFs according to the URDF.
+
+Important frames:
+    - `map`: The global frame of the map.
+    - `odom`: The frame of the odometry.
+    - `base_link`: The frame of the robot base.
+
+
+The tranformation between `map` and `base_link` is used to calcaulate the position of the robot relative to the world. The location is stable over long term, but can be inacuurate over short term. 
+
+The `odom` frame is an estimation of the robot location based on its internal measurements. The location is accurate and smooth over short time periods, but can drift over long time periods.
+
+<img src="../assets/images/Nav2/TF.png" width="400">
+
+As a consequence, the `odom` frame may jump around, but the location of `base_link` relative to `map` is stable over time.
+
+# NAV2 STACK
+Before looking into the official NAV2 architecture drawing, let's look at a simpliefied version of the architecture.
+
+
+In order to make NAV2 work we need to provide it with the following inputs:
+> **MAP**: A map of the environment.
+> 
+> **TF**: The transformation between the map and the robot base.
+> 
+> **Sensor Data**: The sensor data from the robot, such as laser scans/ point clouds/ depth images/ odometry. 
+>
+
+
+Next, we send a **Pose Goal**. What happens then?
+<img src="../assets/images/Nav2/nav2_simplified.png" width="600">
