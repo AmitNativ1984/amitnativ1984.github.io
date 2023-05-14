@@ -20,4 +20,4 @@ ros2 launch turtlebot3_navigation2 navigation2.launch.py map:=<path_to_map.yaml>
 
 
 
-[environment map]: assets/images/Nav2/latent-space.png
+[environment map]: /assets/images/Nav2/my_map.pgm
