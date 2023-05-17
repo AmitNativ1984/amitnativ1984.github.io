@@ -277,7 +277,7 @@ Here is a link to the documentation:
 Nav2 uses **Behavior Trees (BTs)** to control the robot's navigation behavior.
 BTs are a way to control the flow of execution of a program based on a tree structure. Nav2 uses [*BehaviorTree.CPP*](https://www.behaviortree.dev/): a C++ library for behvaior trees. In the end behavior trees control the flow of execution, and decide which action to execute next, based on the current state of the robot, and the feedback from the different ROS nodes (very often they will be specifically ROS actions). 
 
-:fire: You should not confuse ROS nodes with behavior nodes; those are two different things.
+:fire: **IMPORTANT** You should not confuse **ROS nodes** with **behavior nodes**; those are two different things.
 
 In the end a behavior tree is an xml file that describes the flow information and execution.
 However, writing a large and complex xml file can be very painful and error prone. Also, debugging and understanding the behavior tree's state could be quite difficult. To simplify this, use [*GROOT*](https://www.behaviortree.dev/groot/). A visal tool to create, visualize and debug the tree exectuation, in real time.
