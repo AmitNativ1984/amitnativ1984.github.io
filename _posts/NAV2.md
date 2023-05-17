@@ -80,6 +80,8 @@ In order to make NAV2 work we need to provide it with the following inputs:
 > **MAP**: A map of the environment.
 > 
 > **TF**: The transformation between the map and the robot base.
+>  - `map` -> `odom`
+>  - `odom` -> `base_link`
 > 
 > **Sensor Data**: The sensor data from the robot, such as laser scans/ point clouds/ depth images/ odometry. 
 
@@ -87,3 +89,201 @@ In order to make NAV2 work we need to provide it with the following inputs:
 Next, we send a **Pose Goal**. What happens then?
 
 <img src="../assets/images/Nav2/nav2_simplified.png">
+
+# ADAPTING A CUSTOM ROBOT TO NAV2
+## *TF*
+
+To adapt a custom robot to NAV2, we need to first provide the TF of the robot. This is done by using the `robot_state_publisher` package. This package requires the URDF and and the joint states of the robot. The joint states are published by the `joint_state_publisher` package.
+
+<img src="../assets/images/NAV2/../Nav2/NAV2_simplified-TF.drawio.png">
+
+In the URDF file there are two major keys:
+- `link`: A link is a rigid body with an inertial frame and a collision frame. It can also have a visual frame (for example, a link can be a robot arm)
+- `joint`: A joint is a connection between two links. Joint can be fixed or movable. For example, it can be the elbow of the robot arm, and it can rotate over time.
+
+### ODOMETERY
+> Used to localize a robot from its starting point, using its internal sensors. 
+> 
+> **Odometry will drift over time.**
+> Will be corrected the map to odom transform.
+
+Examples for odometry:
+- Wheel odometry
+- Foot odometry (step length)
+- IMU (inertial measurement unit)
+- Visual odometry (using cameras)
+
+## HARDWARE CONTROLLER
+The hardware controller is responsible to send velocity commands to the robot motors. 
+In ourcase this is the learned policy.
+
+There are two ways to communicate with the hardware controller:
+- **Option 1**: writing our own controller interfaces
+- **Option 2**: using the `ros2_control` package.
+
+
+# RUN NAV2 WITH A CUSTOM ROBOT:
+
+Follow these steps to collect and save a map of the environment using the SLAM toolbox:
+1. `ros2 launch nav2_bringup navigation_launch.py` 
+
+   (Launch the navigation stack with the default parameters.)
+
+1. `ros2 launch slam_toolbox online_async_launch.py` 
+
+   (Will launch the SLAM toolbox with the default parameters.)
+
+1. `rviz2`
+
+   (Will launch RVIZ2.)
+
+1. `ros2 run teleop_twist_keyboard teleop_twist_keyboard`
+   (This will allow us to control the robot with the keyboard.
+   This can also be replaced with a joystick.)
+
+1. `ros2 run nav2_map_server map_saver_cli -f my_map`
+   
+   (This will save the map to the `my_map` file.)
+
+-----
+
+Follow these steps to use the saved map for navigation:
+1. `ros2 launch nav2_bringup bringup_launch.py map:=<path_to_map.yaml>`
+
+
+## SETTING UP LAUNCH FILES AND PARAMETERS
+A much easier way to launch the navigation stack is to use a single launch file.
+
+1. If NAV2 is installed on the computer, the launch and param files are found in /opt/ros/$ROS_DISTRO/share/nav2*/launch. 
+
+Most of the launch files provide a good template for our own launch files.
+They are also found on: [nav2 github repo](https://github.com/ros-planning/navigation2)
+   
+
+# INTERACT PROGRAMATICALLY WITH NAV2
+NAV2 stack interacts with the robot using **`topics pubs`, `services` and `actions`.**
+NAV2 also provides **Python API, (nav2_simple_commander)** which allows us to interact with the navigation stack programatically and fairly easily.
+<img src="../assets/images/Nav2/NAV2_programmaticaly.png" width="800">
+
+To install it:
+> `sudo apt install ros-<rosdistro>-nav2-simple-commander`
+
+The following will go through major functions of the `nav2_simple_commander` API:
+
+## TOPICS:
+| Topic Name | Message Type | Description |
+|:----------:|:------------:|:-----------:|
+| `/initalPose` | geometry_msgs/PoseWithCovarianceStamped | Publish the initial pose of the robot. |
+
+
+```python
+#!/usr/bin/env python3
+import rclpy
+from nav2_simple_commander.robot_navigator import BasicNavigator
+from geometry_msgs.msg import PoseStamped
+import tf_transformations
+
+def create_pose_stamped(navigator: BasicNavigator, position_x, position_y, orientation_z):
+    q_x, q_y, q_z, q_w = tf_transformations.quaternion_from_euler(0.0, 0.0, orientation_z)
+    pose = PoseStamped()
+    pose.header.frame_id = 'map'
+    pose.header.stamp = navigator.get_clock().now().to_msg()
+    pose.pose.position.x = position_x
+    pose.pose.position.y = position_y
+    pose.pose.position.z = 0.0
+    pose.pose.orientation.x = q_x
+    pose.pose.orientation.y = q_y
+    pose.pose.orientation.z = q_z
+    pose.pose.orientation.w = q_w
+    return pose
+
+def main():
+    # --- Init
+    rclpy.init()
+    nav = BasicNavigator()
+
+    # --- Set initial pose
+    initial_pose = create_pose_stamped(nav, 0.0, 0.0, 0.0)
+    nav.setInitialPose(initial_pose)
+
+    # --- Wait for Nav2
+    nav.waitUntilNav2Active()
+
+    # --- Send Nav2 goal
+    waypoints = []
+    waypoints.append(create_pose_stamped(nav, 2.0, -2.0, 1.57))
+    waypoints.append(create_pose_stamped(nav, 4.0, 0.8, 0.0))
+    waypoints.append(create_pose_stamped(nav, 8.0, 1.0, -1.57))
+    waypoints.append(create_pose_stamped(nav, 8.0, -0.5, 1.57))
+    waypoints.append(create_pose_stamped(nav, 5.0, 5.0, 3.14))
+    waypoints.append(create_pose_stamped(nav, 3.0, 4.0, 1.57))
+    waypoints.append(create_pose_stamped(nav, 4.0, 5.0, 0.0))
+    waypoints.append(create_pose_stamped(nav, 5.0, 3.0, -1.57))
+    waypoints.append(create_pose_stamped(nav, 4.0, 0.8, 3.14))
+    waypoints.append(create_pose_stamped(nav, -4.0, 3.5, -1.57))
+    waypoints.append(create_pose_stamped(nav, -4.0, 0.0, 1.57))
+
+    # --- Go to one pose
+    # nav.goToPose(goal_pose1)
+    # while not nav.isTaskComplete():
+    #     feedback = nav.getFeedback()
+    #     # print(feedback)
+
+    # --- Follow waypoints
+    nav.followWaypoints(waypoints)
+    while not nav.isTaskComplete():
+        feedback = nav.getFeedback()
+        # print(feedback)
+
+    print(nav.getResult())
+
+    # --- Shutdown
+    rclpy.shutdown()
+
+if __name__ == '__main__':
+    main()
+```
+
+
+## NAVIGATE TO POSE ACTION:
+`NavigatToPose` action is most suitable for point to point navigation. Becuase it is a ROS ACTION, it reports feedback and results, that can be later monitored by the system (behavior tree for example).
+
+This is the stacture of the action: 
+```python
+#goal definition
+geometry_msgs/PoseStamped pose
+string behavior_tree
+---
+#result definition
+std_msgs/Empty result
+---
+# feedback definition
+geometry_msgs/PoseStamped current_pose
+builtin_interfaces/Duration navigation_time
+builtin_interfaces/Duration estimated_time_remaining
+int16 number_of_recoveries
+float32 distance_remaining
+```
+The inputs to the action are:
+- `pose` - The goal pose.
+- `behavior_tree (optinal)` - The behavior tree to be executed during navigation. It will use the default behavior tree if non is specified.
+
+# NAV2 SIMPLE COMMANDER
+Nav2 provides python API to interact with the navigation stack programatically and fairly easily.
+Here is a link to the documentation:
+[nav2 simple commander documentation](https://navigation.ros.org/commander_api/index.html)
+
+# BEHAVIOR TREES
+Nav2 uses **Behavior Trees (BTs)** to control the robot's navigation behavior.
+BTs are a way to control the flow of execution of a program based on a tree structure. Nav2 uses [*BehaviorTree.CPP*](https://www.behaviortree.dev/): a C++ library for behvaior trees. In the end behavior trees control the flow of execution, and decide which action to execute next, based on the current state of the robot, and the feedback from the different ROS nodes (very often they will be specifically ROS actions). 
+
+:fire: You should not confuse ROS nodes with behavior nodes; those are two different things.
+
+In the end a behavior tree is an xml file that describes the flow information and execution.
+However, writing a large and complex xml file can be very painful and error prone. Also, debugging and understanding the behavior tree's state could be quite difficult. To simplify this, use [*GROOT*](https://www.behaviortree.dev/groot/). A visal tool to create, visualize and debug the tree exectuation, in real time.
+
+<img src="../assets/images/Nav2/goot_BT.png" with=800>
+
+
+
+
