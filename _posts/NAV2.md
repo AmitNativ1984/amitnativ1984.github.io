@@ -277,13 +277,296 @@ Here is a link to the documentation:
 Nav2 uses **Behavior Trees (BTs)** to control the robot's navigation behavior.
 BTs are a way to control the flow of execution of a program based on a tree structure. Nav2 uses [*BehaviorTree.CPP*](https://www.behaviortree.dev/): a C++ library for behvaior trees. In the end behavior trees control the flow of execution, and decide which action to execute next, based on the current state of the robot, and the feedback from the different ROS nodes (very often they will be specifically ROS actions). 
 
-:fire: **IMPORTANT** You should not confuse **ROS nodes** with **behavior nodes**; those are two different things.
+:fire: **IMPORTANT:** You should not confuse **ROS nodes** with **behavior nodes**; those are two different things.
 
 In the end a behavior tree is an xml file that describes the flow information and execution.
 However, writing a large and complex xml file can be very painful and error prone. Also, debugging and understanding the behavior tree's state could be quite difficult. To simplify this, use [*GROOT*](https://www.behaviortree.dev/groot/). A visal tool to create, visualize and debug the tree exectuation, in real time.
 
 <img src="../assets/images/Nav2/goot_BT.png" with=800>
 
+## BT NAVIGATOR
+The navigation system's package in charge of managing behavior trees is the **`nav2_bt_navigator`**. It is in charge of controlling the robot movements, and is composed of several parts:
+- **`bt_navigator`** - The ros node and its configuration file
+- **`xml file`** - The behavior tree file
+- **`recoveries_server`** ros node and its configuration file.
+   
+
+
+### **The `bt_navigator` node**
+This node is in charge of managing the *path planner*, the *controller* and the *recovery server*
+
+#### **How to create a behavior**
+To create the behavior, you must create the XML file using the types of node available, or create new ones as `behavior_tree_cpp` plugins.
+Here is an example of GROOT's interface and the XML file it generates:
+
+```xml
+<!--
+  This Behavior Tree replans the global path periodically at 1 Hz, and it also has
+  recovery actions.
+-->
+<root main_tree_to_execute="MainTree">
+  <BehaviorTree ID="MainTree">
+    <RecoveryNode number_of_retries="6" name="NavigateRecovery">
+      <PipelineSequence name="NavigateWithReplanning">
+        <RateController hz="1.0">
+          <RecoveryNode number_of_retries="1" name="ComputePathToPose">
+            <ComputePathToPose goal="{goal}" path="{path}" planner_id="GridBased"/>
+            <ClearEntireCostmap service_name="global_costmap/clear_entirely_global_costmap"/>
+          </RecoveryNode>
+        </RateController>
+        <RecoveryNode number_of_retries="1" name="FollowPath">
+          <FollowPath path="{path}" controller_id="FollowPath"/>
+          <ClearEntireCostmap service_name="local_costmap/clear_entirely_local_costmap"/>
+        </RecoveryNode>
+      </PipelineSequence>
+      <SequenceStar name="RecoveryActions">
+        <ClearEntireCostmap service_name="local_costmap/clear_entirely_local_costmap"/>
+        <ClearEntireCostmap service_name="global_costmap/clear_entirely_global_costmap"/>
+        <Spin spin_dist="1.57"/>
+        <Wait wait_duration="5"/>
+      </SequenceStar>
+    </RecoveryNode>
+  </BehaviorTree>
+</root>
+
+```
+
+<img src="../assets/images/Nav2/behavior_tree_of_xml.png" width="800">
+
+## Recovery Behaviores
+The Nav2 Recovery behaviors are activated automatically when the robot gets stuck, to try and recover.
+***Recovery Behaviros* are activated by the `bt_navigator` when on of the checkers specified in the controller server's config file signals that the robot is progressing towards it's goal:**
+
+1. The `controller_server` detects the situation when the robot is stuck and notified the `bt_navigator` node.
+2. AS indicated in its config file, the `bt_navigator` calls the `recovery_server` to activate the recovery plugin.
+
+You configure the recovery behaviors in the `bt_navigator`'s config file. Here is an example of the config file. Take note of the recovery **plugins**:
+
+```yaml
+recoveries_server:
+  ros__parameters:
+    costmap_topic: local_costmap/costmap_raw
+    footprint_topic: local_costmap/published_footprint
+    cycle_frequency: 10.0
+    recovery_plugins: ["spin", "backup", "wait"]
+    spin:
+      plugin: "nav2_recoveries/Spin"
+    backup:
+      plugin: "nav2_recoveries/BackUp"
+    wait:
+      plugin: "nav2_recoveries/Wait"
+    global_frame: odom
+    robot_base_frame: base_link
+    transform_timeout: 0.1
+    use_sim_time: true
+    simulate_ahead_time: 2.0
+    max_rotational_vel: 1.0
+    min_rotational_vel: 0.4
+    rotational_acc_lim: 3.2
+```
+
+At present there are 3 recovery plugins available by the `nav2_recoveries` package:
+1. `Spin` - Rotates the robot in place, while costs map are upated. This is useful when the robot sees the costmap around it filled with obstacles.
+2. `Backup`: performs a linear motion of the robot for a certain distance.
+3. `Wait`: stops the robot in place and waits for a certain amount of time.
+
+The recovery server has its own configuration file, with its own parameters. Here is an example of the config file:
+
+```yaml
+    costmap_topic: local_costmap/costmap_raw
+    footprint_topic: local_costmap/published_footprint
+    cycle_frequency: 10.0
+```
+
+The recovery server plugins will operate under a certain set of conditions that appply to all of them. Those conditions are about the speed limitations and the frames to be used.
+
+```yaml
+    global_frame: odom
+    robot_base_frame: base_link
+    transform_timeout: 0.1
+    use_sim_time: true
+    simulate_ahead_time: 2.0
+    max_rotational_vel: 1.0
+    min_rotational_vel: 0.4
+    rotational_acc_lim: 3.2
+
+```
+
+### How they work
+**Each plugin provides an action server which will be called by the behavior *nodes* that requrie it**
+
+examples of actions in of the system (each is a *node* of the behavior tree):
+``` yaml
+/backup
+/compute_path_through_poses
+/compute_path_to_pose
+/follow_path
+/move_robot_as
+/navigate_through_poses
+/navigate_to_pose
+/spin
+/wait
+
+```
+
+# NAV2 Plugins and Custom Plugin Creation:
+
+
+The first question is:
+
+- Why do you use PLUGINS in Nav2?
+
+Plugins are used because they improve the flexibility of the Nav2 pipeline. Using plugins allows you to change only a .yaml file of the controller, planner, etc., and completely change the functionality without much compilation overhead.
+
+It is especially useful for Costmaps (for review in Section E.2.2) because Costmap filters stack on top of each other, allowing plugins to change the way Costmaps are processed for navigation quickly.
+
+Nav2 has a huge selection of PLUG and PLAY plugins. This is another great advantage. Developers can create plugins following a basic API. They will be ready for use in the desired application, with the security that they will connect to the needed navigation systems.
+
+## **Where do you set `the plugin you want to use`**?
+The answer is in the `.yaml files that load the parameters for your different navigation nodes`.
+Here is a [list of the Navigation plugins that come with Nav2](https://navigation.ros.org/plugins/index.html?highlight=plugins) 
+
+All plugins have very similar structures, especially when they regulate the same elements like `Costmaps`, `Planning`, `Control` or `Behavior Trees`. Here is an exmple of a simplified version for the **Static Layer Plugin**:
+
+```cpp
+...INCLUDES...
+
+
+PLUGINLIB_EXPORT_CLASS(nav2_costmap_2d::StaticLayer, nav2_costmap_2d::Layer)
+
+
+namespace nav2_costmap_2d
+{
+
+StaticLayer::StaticLayer()
+: map_buffer_(nullptr)
+{
+}
+
+StaticLayer::~StaticLayer()
+{
+}
+
+void
+StaticLayer::onInitialize()
+{
+  ...CODE...
+}
+
+void
+StaticLayer::activate()
+{
+    ...CODE...
+}
+
+void
+StaticLayer::deactivate()
+{
+  ...CODE...
+}
+
+void
+StaticLayer::reset()
+{
+  ...CODE...
+}
+
+void
+StaticLayer::getParameters()
+{
+  ...CODE...
+}
+
+void
+StaticLayer::processMap(const nav_msgs::msg::OccupancyGrid & new_map)
+{
+  ...CODE...
+}
+
+void
+StaticLayer::matchSize()
+{
+  ...CODE...
+}
+
+unsigned char
+StaticLayer::interpretValue(unsigned char value)
+{
+  ...CODE...
+}
+
+void
+StaticLayer::incomingMap(const nav_msgs::msg::OccupancyGrid::SharedPtr new_map)
+{
+  ...CODE...
+}
+
+void
+StaticLayer::incomingUpdate(map_msgs::msg::OccupancyGridUpdate::ConstSharedPtr update)
+{
+  ...CODE...
+}
+
+
+void
+StaticLayer::updateBounds(
+  double /*robot_x*/, double /*robot_y*/, double /*robot_yaw*/, double * min_x,
+  double * min_y,
+  double * max_x,
+  double * max_y)
+{
+  ...CODE...
+}
+
+void
+StaticLayer::updateCosts(
+  nav2_costmap_2d::Costmap2D & master_grid,
+  int min_i, int min_j, int max_i, int max_j)
+{
+  ...CODE...
+}
+
+/**
+  * @brief Callback executed when a parameter change is detected
+  * @param event ParameterEvent message
+  */
+rcl_interfaces::msg::SetParametersResult
+StaticLayer::dynamicParametersCallback(
+  std::vector<rclcpp::Parameter> parameters)
+{
+  ...CODE...
+}
+
+}  // namespace nav2_costmap_2d
+
+```
 
 
 
+As you can see, it is a bunch of methods. We are showing you this because there are two types of methods here:
+
+  * **Standard Methods** are used by your unique code because you must calculate something, access a topic or a database, and execute a deep learning algorithm - whatever you need to perform your task.
+
+  * **API PLUGIN Methods**: You will override these from the parent class, in this case, nav2_costmap_2d::Layer. Each one has its COMPULSORY and OPTIONAL methods. These methods allow the plugins to work plug and play because the plugin loading system calls these methods to perform the essential plugin functions for the task. Here you have the list. As you can see, all of them are virtual to allow this functionality:
+
+    ```cpp
+    virtual void onInitialize();
+
+    virtual void activate();
+
+    virtual void deactivate();
+
+    virtual void reset();
+
+    virtual bool isClearable() {return false;}
+
+    virtual void updateBounds(
+    double robot_x, double robot_y, double robot_yaw, double * min_x,
+    double * min_y, double * max_x, double * max_y);
+
+    virtual void updateCosts(
+    nav2_costmap_2d::Costmap2D & master_grid,
+    int min_i, int min_j, int max_i, int max_j);
+
+    virtual void matchSize();
+    ```
