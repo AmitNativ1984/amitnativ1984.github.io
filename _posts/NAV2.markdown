@@ -154,6 +154,38 @@ Recovery behaviors are a set of predefined behaviors that the robot can execute 
 - If the global planner is unable to generate a path, or the local planner is unable to follow path, then the recovery server is called.
 - For example: spin 90 degrees, move back 1 meter, then try again.
 
+
+
+# Velocity Smoother
+The nav2_velocity_smoother is a package containing a lifecycle-component node for smoothing velocities sent by Nav2 to robot controllers. The aim of this package is to implement velocity, acceleration, and deadband smoothing from Nav2 to reduce wear-and-tear on robot motors and hardware controllers by smoothing out the accelerations/jerky movements that might be present with some local trajectory planners’ control efforts.
+
+# Collision Monitor
+
+The Collision Monitor is a node providing an additional level of robot safety. It performs several collision avoidance related tasks using incoming data from the sensors, bypassing the costmap and trajectory planners, to monitor for and prevent potential collisions at the emergency-stop level.
+
+This is a useful and integral part of large heavy industrial robots, or robots moving with high velocities, around people or other dynamic agents (e.g. other robots) as a safety mechanism for high-response emergency stopping. The costmaps / trajectory planners will handle most situations, but this is to handle obstacles that virtually appear out of no where (from the robot’s perspective) or approach the robot at such high speed it needs to immediately stop to prevent collision.
+
+The following models of safety behaviors are employed by Collision Monitor:
+
+  **Stop model**: Define a zone and a point threshold. If min_points or more obstacle points appear inside this area, stop the robot until the obstacles will disappear.
+
+  **Slowdown model**: Define a zone around the robot and slow the maximum speed for a slowdown_ratio, if min_points or more points will appear inside the area.
+
+  **Limit model**: Define a zone around the robot and restricts the maximum linear and angular velocities to linear_limit and angular_limit values accordingly, if min_points or more points will appear inside the area.
+
+  **Approach model**: Using the current robot speed, estimate the time to collision to sensor data. If the time is less than time_before_collision seconds (0.5, 2, 5, etc…), the robot will slow such that it is now at least time_before_collision seconds to collision. The effect here would be to keep the robot always time_before_collision seconds from any collision.
+
+The data may be obtained from different data sources:
+
+    Laser scanners (sensor_msgs::msg::LaserScan messages)
+
+    PointClouds (sensor_msgs::msg::PointCloud2 messages)
+
+    IR/Sonars (sensor_msgs::msg::Range messages)
+
+
+
+
 # NAV2 STACK
 Before looking into the official NAV2 architecture drawing, let's look at a simpliefied version of the architecture.
 
