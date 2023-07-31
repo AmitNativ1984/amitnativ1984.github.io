@@ -38,6 +38,7 @@ markdown: kramdown
 # include:
 include:
   - assets/images/2022-12-16-blood-pressure-with-cnn/**
+  - assets/images/Nav2/**
 # Exclude from processing.
 # The following items will not be processed, by default.
 # Any item listed under the `exclude:` key here will be automatically added to
