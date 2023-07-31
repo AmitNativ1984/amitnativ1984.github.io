@@ -88,6 +88,67 @@ Example of DWB controller:
 <img src="../assets/images/Nav2/trajectories.gif" width="600">
 
 
+# BEHAVIOR TREES
+Nav2 uses **Behavior Trees (BTs)** to control the robot's navigation behavior.
+BTs are a way to control the flow of execution of a program based on a tree structure. Nav2 uses [*BehaviorTree.CPP*](https://www.behaviortree.dev/): a C++ library for behvaior trees. In the end behavior trees control the flow of execution, and decide which action to execute next, based on the current state of the robot, and the feedback from the different ROS nodes (very often they will be specifically ROS actions). 
+
+:fire: **IMPORTANT:** You should not confuse **ROS nodes** with **behavior nodes**; those are two different things.
+
+In the end a behavior tree is an xml file that describes the flow information and execution.
+However, writing a large and complex xml file can be very painful and error prone. Also, debugging and understanding the behavior tree's state could be quite difficult. To simplify this, use [*GROOT*](https://www.behaviortree.dev/groot/). A visal tool to create, visualize and debug the tree exectuation, in real time.
+
+<img src="../assets/images/Nav2/goot_BT.png" with=800>
+
+## BT NAVIGATOR
+The navigation system's package in charge of managing behavior trees is the **`nav2_bt_navigator`**. It is in charge of controlling the robot movements, and is composed of several parts:
+- **`bt_navigator`** - The ros node and its configuration file
+- **`xml file`** - The behavior tree file
+- **`recoveries_server`** ros node and its configuration file.
+   
+
+
+### **The `bt_navigator` node**
+This node is in charge of managing the *path planner*, the *controller* and the *recovery server*
+
+#### **How to create a behavior**
+To create the behavior, you must create the XML file using the types of node available, or create new ones as `behavior_tree_cpp` plugins.
+Here is an example of GROOT's interface and the XML file it generates:
+
+```xml
+<!--
+  This Behavior Tree replans the global path periodically at 1 Hz, and it also has
+  recovery actions.
+-->
+<root main_tree_to_execute="MainTree">
+  <BehaviorTree ID="MainTree">
+    <RecoveryNode number_of_retries="6" name="NavigateRecovery">
+      <PipelineSequence name="NavigateWithReplanning">
+        <RateController hz="1.0">
+          <RecoveryNode number_of_retries="1" name="ComputePathToPose">
+            <ComputePathToPose goal="{goal}" path="{path}" planner_id="GridBased"/>
+            <ClearEntireCostmap service_name="global_costmap/clear_entirely_global_costmap"/>
+          </RecoveryNode>
+        </RateController>
+        <RecoveryNode number_of_retries="1" name="FollowPath">
+          <FollowPath path="{path}" controller_id="FollowPath"/>
+          <ClearEntireCostmap service_name="local_costmap/clear_entirely_local_costmap"/>
+        </RecoveryNode>
+      </PipelineSequence>
+      <SequenceStar name="RecoveryActions">
+        <ClearEntireCostmap service_name="local_costmap/clear_entirely_local_costmap"/>
+        <ClearEntireCostmap service_name="global_costmap/clear_entirely_global_costmap"/>
+        <Spin spin_dist="1.57"/>
+        <Wait wait_duration="5"/>
+      </SequenceStar>
+    </RecoveryNode>
+  </BehaviorTree>
+</root>
+
+```
+
+<img src="../assets/images/Nav2/behavior_tree_of_xml.png" width="800">
+
+
 ## RECOVERY SERVER and RECOVERY BEHAVIORS
 Recovery behaviors are a set of predefined behaviors that the robot can execute when it is stuck, as can sometimes happen is real world scenarios. 
 - If the global planner is unable to generate a path, or the local planner is unable to follow path, then the recovery server is called.
@@ -305,65 +366,7 @@ Nav2 provides python API to interact with the navigation stack programatically a
 Here is a link to the documentation:
 [nav2 simple commander documentation](https://navigation.ros.org/commander_api/index.html)
 
-# BEHAVIOR TREES
-Nav2 uses **Behavior Trees (BTs)** to control the robot's navigation behavior.
-BTs are a way to control the flow of execution of a program based on a tree structure. Nav2 uses [*BehaviorTree.CPP*](https://www.behaviortree.dev/): a C++ library for behvaior trees. In the end behavior trees control the flow of execution, and decide which action to execute next, based on the current state of the robot, and the feedback from the different ROS nodes (very often they will be specifically ROS actions). 
 
-:fire: **IMPORTANT:** You should not confuse **ROS nodes** with **behavior nodes**; those are two different things.
-
-In the end a behavior tree is an xml file that describes the flow information and execution.
-However, writing a large and complex xml file can be very painful and error prone. Also, debugging and understanding the behavior tree's state could be quite difficult. To simplify this, use [*GROOT*](https://www.behaviortree.dev/groot/). A visal tool to create, visualize and debug the tree exectuation, in real time.
-
-<img src="../assets/images/Nav2/goot_BT.png" with=800>
-
-## BT NAVIGATOR
-The navigation system's package in charge of managing behavior trees is the **`nav2_bt_navigator`**. It is in charge of controlling the robot movements, and is composed of several parts:
-- **`bt_navigator`** - The ros node and its configuration file
-- **`xml file`** - The behavior tree file
-- **`recoveries_server`** ros node and its configuration file.
-   
-
-
-### **The `bt_navigator` node**
-This node is in charge of managing the *path planner*, the *controller* and the *recovery server*
-
-#### **How to create a behavior**
-To create the behavior, you must create the XML file using the types of node available, or create new ones as `behavior_tree_cpp` plugins.
-Here is an example of GROOT's interface and the XML file it generates:
-
-```xml
-<!--
-  This Behavior Tree replans the global path periodically at 1 Hz, and it also has
-  recovery actions.
--->
-<root main_tree_to_execute="MainTree">
-  <BehaviorTree ID="MainTree">
-    <RecoveryNode number_of_retries="6" name="NavigateRecovery">
-      <PipelineSequence name="NavigateWithReplanning">
-        <RateController hz="1.0">
-          <RecoveryNode number_of_retries="1" name="ComputePathToPose">
-            <ComputePathToPose goal="{goal}" path="{path}" planner_id="GridBased"/>
-            <ClearEntireCostmap service_name="global_costmap/clear_entirely_global_costmap"/>
-          </RecoveryNode>
-        </RateController>
-        <RecoveryNode number_of_retries="1" name="FollowPath">
-          <FollowPath path="{path}" controller_id="FollowPath"/>
-          <ClearEntireCostmap service_name="local_costmap/clear_entirely_local_costmap"/>
-        </RecoveryNode>
-      </PipelineSequence>
-      <SequenceStar name="RecoveryActions">
-        <ClearEntireCostmap service_name="local_costmap/clear_entirely_local_costmap"/>
-        <ClearEntireCostmap service_name="global_costmap/clear_entirely_global_costmap"/>
-        <Spin spin_dist="1.57"/>
-        <Wait wait_duration="5"/>
-      </SequenceStar>
-    </RecoveryNode>
-  </BehaviorTree>
-</root>
-
-```
-
-<img src="../assets/images/Nav2/behavior_tree_of_xml.png" width="800">
 
 ## Recovery Behaviores
 The Nav2 Recovery behaviors are activated automatically when the robot gets stuck, to try and recover.
