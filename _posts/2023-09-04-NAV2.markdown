@@ -1,3 +1,12 @@
+---
+layout: post
+title:  "OVERVIEW OF NAV2 STACK"
+date:   2023-09-04 17:00:00 +0200
+permalink: /nav2/
+categories: ros2
+usemathjax: true
+---
+
 # UNDERSTAND THE NAV2 STACK
 This document will give an overview of Nav2 stack, and the main conecpts for robot autonomous navigation.
 
@@ -54,6 +63,7 @@ At the heart of path planning is the idea of costmaps. The idea is to generate a
 A costmap is a 2D grid that assigns a cost to each cell. The cost is a value that represents how difficult is to navigate throught that cell. The costmap is used by the global planner to generate a path from the initial position to the goal.
 
 Here is an example from Nav2 with a simulated environment:
+
 | Occupancy Map | Inflation Layer | Global Cost Map |
 |:-------------:|:--------:|:---------------:|
 | <img src="../assets/images/Nav2/my_map.png" width="400"> | <img src="../assets/images/Nav2/cost_map.png" width="400"> | <img src="../assets/images/Nav2/global_cost_map.png" width="400"> |
@@ -296,6 +306,7 @@ To install it:
 The following will go through major functions of the `nav2_simple_commander` API:
 
 ## TOPICS:
+
 | Topic Name | Message Type | Description |
 |:----------:|:------------:|:-----------:|
 | `/initalPose` | geometry_msgs/PoseWithCovarianceStamped | Publish the initial pose of the robot. |

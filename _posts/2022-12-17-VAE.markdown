@@ -18,12 +18,7 @@ Lets look at the following example: Say we have a dataset of faces. We want to r
 ![faces-autoencoder]
 
 # Autoencoders
-The general idea of autoencoders is to set the encoder and decoder as neural networks. The training aims to find the best encoder and decoder that will minimize the loss of information. The network is trained by encoding and reconstructing the input data, and then backpropagate the error to update the network weights and biases. The following figure shows the process:
-![nn-autoencoder]
-
-## Relation to PCA:
-If we set the encoder to be a single layer neural network, with only linear activation functions, the autoencoder will be equivalent to PCA. This is becuase the autoencoder learns a linear transform that projects the input data to a latent space with fewer dimensions, and then reconstructs it.
-However, in constrast to PCA, the vectors spanning the latent space are not necessarly indepent or orthogonal. This is a result of the learning process of the autoencoder.
+The general idea of autoencoders is to set the encoder and decoder as neural networks. The training aims to find the best encoder and decoder that will minimize the loss of information. The network is trained by encoding and reconstructing the input data, and then backpropagate the error to update the network ./ing the latent space are not necessarly indepent or orthogonal. This is a result of the learning process of the autoencoder.
 ![pca]
 
 ## Making autoencoders deep and non-linear
