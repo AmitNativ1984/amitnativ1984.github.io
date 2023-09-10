@@ -1,8 +1,11 @@
 ---
-layout: post
+layout: posts
 title:  "The RL Framework: The Problem"
 date:   2023-09-05 12:47:0
 usemathjax: true
+toc: true
+# classes: wide
+author_profile: true
 ---
 
 # Summary
