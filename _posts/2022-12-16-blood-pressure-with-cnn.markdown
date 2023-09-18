@@ -1,9 +1,11 @@
 ---
-layout: post
+layout: posts
 title:  "BLOOD PRESSURE ESTIMATION FROM PPG SIGNALS USING CONVOLUTIONAL NEURAL NETWORKS AND SIAMESE NETWORK"
 date:   2022-12-16 17:33:00 +0200
 categories: intresting
 usemathjax: true
+author_profile: true
+permalink: /posts/
 ---
 
 An overview of the paper: 
