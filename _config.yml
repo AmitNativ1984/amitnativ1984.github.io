@@ -43,7 +43,7 @@ markdown: kramdown
 author:
   name: Amit Nativ
   email: amitnativ@gmail.com
-  avatar: "/assets/images/bio-photo.jpg"
+  avatar: "/assets/images/bio-photo-2.jpg"
 
 defaults:
   # _posts
@@ -57,7 +57,33 @@ defaults:
       comments: true
       share: true
       related: true
+      mathjax: true
+      classes: wide
+      show_date: true
+      toc: true
+  # _pages
+  - scope:
+      path: ""
+      type: pages
+    values:
+      layout: single
+      author_profile: true
 
+  # _portfolio
+  - scope:
+      path: ""
+      type: portfolio
+    values:
+      layout: single
+      author_profile: true
+      read_time: true
+      comments: true
+      share: true
+      related: true
+      mathjax: true
+      classes: wide
+      show_date: true
+      toc: true
 
 # header:
 #   teaser: "/assets/images/bio-photo.jpg"
