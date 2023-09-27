@@ -41,7 +41,7 @@ feature_row:
 bio_image:
     - image_path: /assets/images/bio-photo-2.jpg
       alt: "profile picture"
-      excerpt: "My name is Amit Nativ. I am a computer vision researcher specializing in robotics. A long my career I had the opprotunity to work on drones, autonomous vehicles and humanoids. I love what I do! This blog is a collection of my thoughts and notes on things I learn a long the way."
+      excerpt: "My name is Amit Nativ. I am a computer vision researcher specializing in robotics. Along my career I had the opprotunity to work on drones, autonomous vehicles and humanoids. I love what I do! This blog is a collection of my thoughts and notes on things I learn a long the way."
       # url: "/about/"
       btn_label: "Read More"
       btn_class: "btn--primary"
