@@ -1,6 +1,6 @@
 main:
-  - title: "Posts"
-    url: /reinforcement-learning/
+  # - title: "Posts"
+  #   url: /reinforcement-learning/
   - title: "Categories"
     url: /categories/
   - title: "Tags"
