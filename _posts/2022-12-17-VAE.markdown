@@ -2,10 +2,11 @@
 layout: posts
 title:  "AN OVERVIEW OF VARIATIONAL AUTOENCODERS"
 date:   2022-12-18 16:00:00 +0200
-categories: intresting
+categories: INTRESETING
 usemathjax: true
 author_profile: true
-permalink: /posts/
+# permalink: /posts/
+published: false
 ---
 
 # Dimentionality reduction

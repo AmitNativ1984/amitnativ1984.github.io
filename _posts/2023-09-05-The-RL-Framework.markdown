@@ -2,7 +2,7 @@
 layout: posts
 title:  "The RL Framework: The Problem"
 date:   2023-09-05 12:47:0
-categories: reinforcement-learning
+categories: REINFORCEMENT-LEARNING
 permalink: /:categories/:title
 ---
 
@@ -31,18 +31,18 @@ permalink: /:categories/:title
 
 ## Discounted Return
 ---
-* The **discounted return** at time step $$t$$ is: $$G_t = R_{t+1} + \gamma R_{t+2} + \gamma^2 R_{t+3} + ... $$
-* The discount rate $$\gamma$$ is a constant that you set.
-  * $$\gamma$$ must satisfy $$0 \leq \gamma \leq 1$$
-  * If $$\gamma = 0$$, the agent only cares about maximizing immediate rewards.
-  * If $$\gamma = 1$$, the return is not discounted.
-  * For larger values of $$\gamma$$, the agent cares more about the distant future. Smaller values of $$\gamma$$ result in more extreme discounting, where in the limit $$\gamma \rightarrow 0$$, the agent only cares about maximizing immediate rewards.
+* The **discounted return** at time step $t$ is: $G_t = R_{t+1} + \gamma R_{t+2} + \gamma^2 R_{t+3} + ...$
+* The discount rate $\gamma$ is a constant that you set.
+  * $\gamma$ must satisfy $0 \leq \gamma \leq 1$
+  * If $\gamma = 0$, the agent only cares about maximizing immediate rewards.
+  * If $\gamma = 1$, the return is not discounted.
+  * For larger values of $\gamma$, the agent cares more about the distant future. Smaller values of $\gamma$ result in more extreme discounting, where in the limit $\gamma \rightarrow 0$, the agent only cares about maximizing immediate rewards.
 
 ## MDPs and One-Step Dynamics
 ---
-* The **state space** $$\mathcal{S}$$ is the set of all (*nonterminal*) states.
-* In episodic tasks we use $$\mathcal{S}^+$$ to denote the set of all states, including terminal states.
-* The **action space** $$\mathcal{A}$$ is the set of all possible actions. $$\mathcal{A}(s)$$ is the set of actions available in state $$s \in \mathcal{S}$$.
+* The **state space** $\mathcal{S}$ is the set of all (*nonterminal*) states.
+* In episodic tasks we use $\mathcal{S}^+$ to denote the set of all states, including terminal states.
+* The **action space** $\mathcal{A}$ is the set of all possible actions. $\mathcal{A}(s)$ is the set of actions available in state $s \in \mathcal{S}$.
 * The **one step dynamics** of the environment defines the probability of the next state and reward, given the current state and action.
     
     $$
@@ -54,7 +54,7 @@ permalink: /:categories/:title
     $$
 
 * A **(finite) Markov Desicition Process (MDP)** is defined by:
-  * A finite set of states $$\mathcal{S}$$ (or $$\mathcal{S}^+$$ for episodic tasks)
-  * A finite set of actions $$\mathcal{A}$$
-  * The one-step dynamics of the environment $$p$$
-  * The **discount rate** $$\gamma \in [0,1]$$
+  * A finite set of states $\mathcal{S}$ (or $\mathcal{S}^+$ for episodic tasks)
+  * A finite set of actions $\mathcal{A}$
+  * The one-step dynamics of the environment $p$
+  * The **discount rate** $\gamma \in [0,1]$

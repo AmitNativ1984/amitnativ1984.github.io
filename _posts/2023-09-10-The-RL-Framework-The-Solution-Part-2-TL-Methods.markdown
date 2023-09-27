@@ -4,7 +4,7 @@ title:  "The RL Framework: The Solution Part 2"
 tagline: "Classical solutions to reinforcement learning problems in discrete space: \
 **Temporal Difference Methods**"
 date:   2023-09-10
-categories: reinforcement-learning
+categories: REINFORCEMENT-LEARNING
 permalink: /:categories/:title
 header:
   overlay_image: /assets/images/Reinforcement-Learning/Blackjack-4.webp
