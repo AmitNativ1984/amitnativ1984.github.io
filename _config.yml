@@ -44,6 +44,7 @@ author:
   name: Amit Nativ
   email: amitnativ@gmail.com
   avatar: "/assets/images/bio-photo-2.jpg"
+       
 
 defaults:
   # _posts
@@ -84,6 +85,11 @@ defaults:
       classes: wide
       show_date: true
       toc: true
+
+collections:
+  reinforcement_learning:
+    output: true
+    # permalink: /:collection/:path/
 
 # header:
 #   teaser: "/assets/images/bio-photo.jpg"
