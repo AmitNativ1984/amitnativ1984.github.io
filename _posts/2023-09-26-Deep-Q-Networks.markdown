@@ -173,7 +173,7 @@ However, there are some problems with this network, and it may not converge to t
         2. Execute action $a_t$ in emulator and observe reward $r_t$ and next input $x_{t+1}$
         3. Prepare next state $S_{t+1} \leftarrow \phi(x_{t-2}, x_{t-1}, x_t, x_{t+1})$
         4. Store experience tuple $(S,A,R,S')$ in replay memory $D$.
-        5. Sample random minibatch of transitions $(\s_j, a_j, r_j, \s_{j+1})$ from $D$
+        5. Sample random minibatch of transitions $(s_j, a_j, r_j, s_{j+1})$ from $D$
         6. $S \leftarrow S'$
 
         7. Obtain random minibatch of tuples $(s_j, a_j, r_j, s_{j+1})$ from $D$
