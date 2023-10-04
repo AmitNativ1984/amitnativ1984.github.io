@@ -1,7 +1,7 @@
 ---
 layout: posts
 title:  "OVERVIEW OF NAV2 STACK"
-date:   2023-09-04 17:00:00 +0200
+date:   2023-09-04 
 categories: ROS2
 permalink: /:categories/:title
 usemathjax: true
