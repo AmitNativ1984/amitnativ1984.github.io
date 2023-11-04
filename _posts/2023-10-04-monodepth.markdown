@@ -109,3 +109,5 @@ $$
 |![loss-function](/assets/images/monodepth/loss-function.png)|
 |:--:|
 | *Loss module outputs left and right disparities $d^l, d^r$. The loss combines smoothness, reconstruction, and left-right disparity consistency terms. **The loss module is calculated for every scale*** |
+
+![results](/assets/images/monodepth/monodepth-results.png)
