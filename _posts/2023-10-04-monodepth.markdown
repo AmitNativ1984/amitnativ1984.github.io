@@ -7,7 +7,7 @@ categories: COMPUTER-VISION
 permalink: /:categories/:title
 header:
   overlay_image: /assets/images/monodepth/monodepth-header.jpeg
-  overlay_filter: 0.5
+  overlay_filter: 0.3
 toc: true
 created: true
 classes: wide
