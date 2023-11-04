@@ -105,3 +105,7 @@ To increase the accuracy of the disparity maps, the network learns to predict th
 $$
 C_{lr}^l = \frac{1}{N} \sum_{i,j} |d_{ij}^l - d_{ij + d^l_{ij}}^r|
 $$
+
+|![loss-function](/assets/images/monodepth/loss-function.png)|
+|:--:|
+| *Loss module outputs left and right disparities $d^l, d^r$. The loss combines smoothness, reconstruction, and left-right disparity consistency terms. **The loss module is calculated for every scale*** |
