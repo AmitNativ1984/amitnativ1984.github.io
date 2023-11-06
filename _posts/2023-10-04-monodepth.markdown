@@ -110,4 +110,77 @@ $$
 |:--:|
 | *Loss module outputs left and right disparities $d^l, d^r$. The loss combines smoothness, reconstruction, and left-right disparity consistency terms. **The loss module is calculated for every scale*** |
 
-![results](/assets/images/monodepth/monodepth-results.png)
+|![results](/assets/images/monodepth/monodepth-results.png)|
+|:--:|
+| *Qualitative results on the KITTI dataset.*|
+
+
+# Unsupervised Learning of Depth and Ego-Motion from Video
+
+In this part, we will discuss the **SfM-Learner** method, which uses a single image stream to estimate the depth of the scene. The method is based on the paper [Unsupervised Learning of Depth and Ego-Motion from Video](https://arxiv.org/pdf/1704.07813.pdf) by Zhou et al.
+
+The authors propose a method to estimate depth and pose from a single monocular image stream. In stereo depth estimation, the depth is estimated by finding correspondences between left and right images, calculating the disparity, and then using the disparity to calculate the depth with a known camera baseline.
+In a similar way, the authors propose to calculate the pose between consecutive frames, find correspondences between frames, and then use the pose to calculate the depth from disparity.
+
+|![pose-estimation-supervision](/assets/images/monodepth/pose-estimation-supervision.png)|
+|:--:|
+| * Overview of the supervision pipeline. The depth network takes the target image $I_t$ and outputs the estimated depth map $\hat{D}_t$. The pose network takes both the target view $I_t$ and two nearby source images from the video stream $I_{t-1}$ and $I_{t+1}$. The output of the pose network is the relative pose transformations $\hat{T}_{t-1 \rightarrow t}$ and $\hat{T}_{t+1 \rightarrow t}$. The depth map, and calculated poses are then used to wrap the source images $I_{t-1}, I_{t+1}$ to the target image $I_t$*|
+
+### Model limitations:
+For monocular depth estimation to work, the following assumptions must be met:
+1. **The scene is static** without moving objects.
+2. **No occlusions** between target view and source view.
+3. **Lambertian surfaces** only, so that photo-consistency error is meaningful.
+
+Violations of these assumptions will corrupt the gradients in training.
+
+#### Explainability Mask
+To improve the robustness of the learning model, an additional ***explainability prediction*** is trained simultaneously with the depth and pose networks. The explainability prediction $\hat{E}_s$ indicates the network belief in where direct view synthesis is valid.
+
+|![explainablity-mask](/assets/images/monodepth/explainablity-mask.png)|
+|:--:|
+| *The explainability mask $\hat{E}_s$. Notice high values around moving objects and occlusions. Those will not be considered for visibility loss*|
+
+
+|![pose-estimation-supervision](/assets/images/monodepth/pose-estimation-explainability-mask-nn.png)|
+|:--:|
+| *NN architecture used*|
+
+### Loss Function
+
+#### 1. Photometric Loss
+Given a set of source images $I_s \in <I_1,...,I_N>$ and a target image $I_t$, the photometric loss can be calculated as:
+
+$$
+\mathcal{L}_{vs} = \sum_{s} \sum_{p} \hat{E}_s(p) |I_t(p) - \hat{I}_s(p)|
+$$
+
+To find the relation between the target image pixel value $p_t$ and the source image pixel value $p_s$, the following calculation holds:
+
+$$
+p_s \sim K \hat{T}_{s \rightarrow t} \hat{D}_t(p_t) K^{-1} p_t
+$$
+
+Where $D_t$ is the depth value of that pixel. As the projected pixel $p_s$ is continuous, we use bilinear sampling to calculate the pixel value. This is also referred to as **differentiable image warping process**
+
+|![bilinear-sampling](/assets/images/monodepth/bilinear-sampling.png)|
+|:--:|
+| $\hat{I}(p_t) = I_s(p_s) = \sum_{i\in{t,b},j\in{l,r}} w^{ij}I_s(p_s^{ij})$|
+
+#### 2. Smoothness Loss
+Similar to what was done in the previous method, the smoothness loss is calculated with weights based on the rgb image gradient magnitude (suppress loss around edges)
+
+$$
+\mathcal{L}_{smooth} = \sum_{s} \sum_{p} |\partial_x D(p)| e^{-|\partial_x I_s(p)|} + |\partial_y D(p)| e^{-|\partial_y I_s(p)|}
+$$
+
+#### 3. Explainability Loss
+Since there is no direct supervision for $\hat{E}_s$, training with $\mathcal{L}_{vs}$  would result in a trival solution for the network to predict $\hat{E}_s = 0$. To resolve this, the authors propose to use a **cross entropy** loss with a constant label 1 at each pixel location. This will to encourage the network to predict $\hat{E}_s$ non-zero values. 
+
+So the final loss is:
+
+$$
+\mathcal{L}_{final} = \sum_{s}\mathcal{L}_{vs} + \lambda_{smooth} \mathcal{L}_{smooth} + \lambda_{exp} \sum_{s}\mathcal{L}_{exp}
+$$
+
+![pose-results](/assets/images/monodepth/pose-results.png)
