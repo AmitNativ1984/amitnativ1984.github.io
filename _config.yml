@@ -43,8 +43,17 @@ markdown: kramdown
 
 author:
   name: Amit Nativ
-  email: amitnativ@gmail.com
   avatar: "/assets/images/bio-photo-2.jpg"
+  links:
+    - label: ""
+      icon: "fab fa-fw fa-github"
+      url: "https://github.com/AmitNativ1984"
+    - label: ""
+      icon: "fab fa-fw fa-linkedin"
+      url: https://www.linkedin.com/in/amit-nativ-45393337/
+    - label: ""
+      icon: "fas fa-fw fa-envelope-square"
+      url: "mailto: amitnativ@gmail.com"
        
 
 defaults:
