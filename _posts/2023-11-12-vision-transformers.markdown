@@ -6,7 +6,7 @@ date:   2023-11-12
 categories: COMPUTER-VISION
 permalink: /:categories/:title
 header:
-  overlay_image: 
+  overlay_image: /assets/images/transformers/transformer-robot.jpg
   overlay_filter: 0.3
 toc: true
 created: true
@@ -15,7 +15,7 @@ classes: wide
 
 # **Vision Transformers (ViT) Explained**
 
-Vision and language are two big domains in machine learning. In the last few years, we have seen a lot of progress in the field of NLP, but the same cannot be said for computer vision. Most of the computer vision tasks are still dominated by Convolutional Neural Networks (CNNs). But recently, there has been a lot of research in the field of vision transformers, and they have shown promising results. In this article, we will explore the vision transformers and see how they work.
+Vision and language are two big domains in machine learning. In the lasten few years, we have seen a lot of progress in the field of NLP, but the same cannot be said for computer vision. Most of the computer vision tasks are still dominated by Convolutional Neural Networks (CNNs). But recently, there has been a lot of research in the field of vision transformers, and they have shown promising results. In this article, we will explore the vision transformers and see how they work.
 
 This post follows the paper: [An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale](https://arxiv.org/abs/2010.11929) by Dosovitskiy et al. A seminal work that first introduced how vision transformers can be used for image classification tasks.
 
@@ -126,13 +126,13 @@ $$
 
 Notice the projection (dot product) between $\mathbf{Q}$ and $\mathbf{K}^T$. This is the similarity between the embeddings. The softmax function is used to normalize the similarity scores, and the output is multiplied by the value matrix $\mathbf{V}$.
 
-![self-attention](/assets/images/transformers/attention-mechanism-step-2.png){:width="400"}
+![self-attention](/assets/images/transformers/attention-mechanism-step-2.png){:width="800"}
 
 
 ### Multi-Head Attention
 Multi-head attention is nothing more than repeating the self-attention layer multiple times, learning different relationships between patches by adding more learnable $\mathbf{K},\mathbf{Q},\mathbf{V}$ matrices. The output of the multi-head attention layer is then concatenated and fed into a linear layer to get the final output.
 
-![multi-head-attention](/assets/images/transformers/multi-head-self-attention-block-diagram.png){:width="400"}
+![multi-head-attention](/assets/images/transformers/multi-head-self-attention-block-diagram.png){:width="800"}
 
 
 The output of the attention layer is then fed into the feed-forward network, which is a simple MLP. Finally, the ouput of the encoder is fed into a classification layer to get the final output.
