@@ -166,7 +166,7 @@ However, there are some problems with this network, and it may not converge to t
 2. Initialize action-value function $Q$ with random weights $\mathbf{w}$
 3. *(Fixed Q-target)* initialize target action-value function $\hat{Q}$ with same weights $\mathbf{w}^- = \mathbf{w}$
 4. For episode $e = 1$ to $M$ do:
-    1. Initialize input x_1$.
+    1. Initialize input $x_1$.
     2. Preprocess initial state: $S_1 \leftarrow \phi(x_1)$
     3. For $t = 1, T$ do:
         1. Choose action $a_t$ from the set of possible actions, using an $\epsilon-greedy$ policy.
@@ -177,9 +177,15 @@ However, there are some problems with this network, and it may not converge to t
         6. $S \leftarrow S'$
 
         7. Obtain random minibatch of tuples $(s_j, a_j, r_j, s_{j+1})$ from $D$
-        8. Set target $y_j = \begin{cases} r_j & \text{for terminal } s_{j+1} \\ r_j + \gamma max_{a'} \hat{q}(s_{j+1}, a; \mathbf{w}^-) & \text{for non-terminal } s_{j+1} \end{cases}$
-        9. Perform a gradient descent step on $(y_j - q(s_j, a_j; \mathbf{w}))^2$ with respect to the network parameters $\mathbf{w}$: $\Delta \mathbf{w} = \alpha (y_j - \hat{q}(s_j, a_j; \mathbf{w})) \nabla_\mathbf{w} q(s_j, a_j; \mathbf{w})$
-        10.  Every $C$ steps reset $\hat{Q} = Q$
+        8. Set target 
+         $$
+          y_j = \begin{cases} 
+            r_j & \text{for terminal } s_{j+1} \\
+            r_j + \gamma max_{a'} \hat{q}(s_{j+1}, a; \mathbf{w}^-) & \text{for non-terminal } s_{j+1} 
+            \end{cases}
+         $$
+        10. Perform a gradient descent step on $(y_j - q(s_j, a_j; \mathbf{w}))^2$ with respect to the network parameters $\mathbf{w}$: $\Delta \mathbf{w} = \alpha (y_j - \hat{q}(s_j, a_j; \mathbf{w})) \nabla_\mathbf{w} q(s_j, a_j; \mathbf{w})$
+        11.  Every $C$ steps reset $\hat{Q} = Q$
     4. End For
 5. End For
 
