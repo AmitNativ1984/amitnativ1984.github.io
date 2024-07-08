@@ -52,7 +52,7 @@ The outcome is that each of the image patches in the image, now has a correspond
 In addition to the patch embeddings, another vector of size $d$ is used to represent the class. This vector is called the classification token, and is also of size $d$. It is is added to the sequence of patch embeddings, and is the first in the sequence.
 
 
-a learnable classification token $\mathbf{c} \in \mathbb{R}^d$ is also added to the sequence of patch embeddings. This classification token is used to predict the class of the image. The classification token is added to the sequence of patch embeddings, and is the first token in the sequence.
+A learnable classification token $\mathbf{c} \in \mathbb{R}^d$ is also added to the sequence of patch embeddings. This classification token is used to predict the class of the image. The classification token is added to the sequence of patch embeddings, and is the first token in the sequence.
 
 ## Positional Embeddings
 Transformers do not have any default mechanism to consider the "order" of the tokens or patches. However, information about the order is essential! For example, in NLP the order of words is important. For example: "I like apples" and "apples like I" have different meanings. The same is true for images. Lets look at the picture of the puzzle below:
@@ -112,7 +112,7 @@ and $\mathbf{W}^Q, \mathbf{W}^K, \mathbf{W}^V \in \mathbb{R}^{d \times d}$ are l
 
 ![q-k-v](/assets/images/transformers/q-k-v.jpeg){:width="800"}
 
-In a very simplistic way, embeddings that have high information about the input, will a lot of information, and will relate well to other embeddings with information about the input.
+In a very simplistic way, embeddings that have high information about the input, will store a lot of information, and will relate well to other embeddings with information about the input.
 
 Therefore, we can take the dot product of the query $\mathbf{Q}$ matrix with the key $\mathbf{K}$ matrix. This will give the similarity between the embeddings, and then multiply the result with the value $\mathbf{V}$ matrix. The output of this operation is the output of the self-attention layer.
 
