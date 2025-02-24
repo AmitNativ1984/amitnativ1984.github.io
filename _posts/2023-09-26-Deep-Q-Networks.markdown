@@ -41,7 +41,10 @@ Mathematically, this can be described as:
 $$
 P(S_{t+1}|S_t) = P(S_{t+1}|S_1, S_2, ..., S_t)
 $$
- functions of the state $s$. For example, if we have a state $s = (x_1, x_2)$, we can define the features as $\mathbf{x}(s) = 
+
+Lets define the state space of our system over a feature space $\mathbf(x)$, so that  $s(\mathbf(x)) = (x_1, x_2, ...)$.
+
+And lets define the transition probablity $P_{ij}$ from state $i$ to state $j$. We can define the following transition matrix:
 
 $$
 P = 
