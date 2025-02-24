@@ -35,6 +35,15 @@ jobs:
         uses: actions/checkout@v4
         with:
            lfs: true
+      - name: setup ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.2
+      - name: install dependencies & build site
+        uses: limjh16/jekyll-action-ts@v2
+        with:
+          enable_cache: true
+      
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5
