@@ -30,9 +30,9 @@ url: "" # the base hostname & protocol for your site, e.g. http://example.com
 github_username:  AmitNativ1984
 repository: AmitNativ1984/amitnativ1984.github.io
 
-# # Build settings
-# theme: "minimal-mistakes-jekyll"
-# minimal_mistakes_skin: "dark" # default" "air", "aqua", "contrast", "dark", "dirt", "neon", "mint", "plum", "sunrise"
+# Build settings
+theme: "minimal-mistakes-jekyll"
+minimal_mistakes_skin: "dark" # default" "air", "aqua", "contrast", "dark", "dirt", "neon", "mint", "plum", "sunrise"
 
 # theme: minima
 plugins:
